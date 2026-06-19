@@ -1,0 +1,16 @@
+/* Reduce button size for action buttons */
+.table td a, 
+.table td button {
+    display: inline-block;
+    padding: 0.35rem 0.65rem !important;
+    font-size: 0.8rem !important;
+    margin: 0 3px !important;
+    border-radius: 0.25rem !important;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.table td {
+    white-space: nowrap;
+}
+

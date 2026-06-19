@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Placement Manager{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row mb-5">
+    <div class="col-md-12">
+        <div style="background: linear-gradient(135deg, #003366 0%, #0066cc 100%); color: white; padding: 80px 40px; border-radius: 10px; text-align: center;">
+            <h1 style="font-size: 3rem; margin-bottom: 20px; font-weight: 700;">
+                <i class="fas fa-graduation-cap"></i> Welcome to PMS
+            </h1>
+            <p style="font-size: 1.3rem; margin-bottom: 30px;">Placement Manager</p>
+            <p style="font-size: 1.1rem; margin-bottom: 30px;">Connecting Students with Opportunities</p>
+            
+            {% if not user.is_authenticated %}
+                <a href="{% url 'register' %}" class="btn btn-light btn-lg me-2">
+                    <i class="fas fa-user-plus"></i> Register as Student
+                </a>
+                <a href="{% url 'login' %}?role=student" class="btn btn-warning btn-lg me-2">
+                    <i class="fas fa-sign-in-alt"></i> Student Login
+                </a>
+                <a href="{% url 'login' %}?role=admin" class="btn btn-light btn-lg">
+                    <i class="fas fa-lock"></i> Admin Login
+                </a>
+            {% else %}
+                {% if user.is_staff %}
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-tachometer-alt"></i> Go to Admin Dashboard
+                    </a>
+                {% else %}
+                    <a href="{% url 'student_dashboard' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-chart-bar"></i> Go to Dashboard
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Section -->
+<div class="row mb-5">
+    <div class="col-md-4 mb-3">
+        <div class="stat-card primary">
+            <div class="label"><i class="fas fa-book"></i> Total Students</div>
+            <div class="number">{{ total_students }}</div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="stat-card success">
+            <div class="label"><i class="fas fa-building"></i> Companies</div>
+            <div class="number">{{ total_companies }}</div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="stat-card info">
+            <div class="label"><i class="fas fa-briefcase"></i> Active Jobs</div>
+            <div class="number">{{ total_jobs }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <h2 style="text-align: center; margin-bottom: 40px; font-weight: 700;">
+            <i class="fas fa-star"></i> Key Features
+        </h2>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-users"></i> For Students
+                </h5>
+                <ul style="list-style: none; padding: 0;">
+                    <li><i class="fas fa-check" style="color: green;"></i> User Registration & Login</li>
+                    <li><i class="fas fa-check" style="color: green;"></i> Complete Profile Management</li>
+                    <li><i class="fas fa-check" style="color: green;"></i> Resume Upload</li>
+                    <li><i class="fas fa-check" style="color: green;"></i> Browse & Apply for Jobs</li>
+                    <li><i class="fas fa-check" style="color: green;"></i> Track Application Status</li>
+                    <li><i class="fas fa-check" style="color: green;"></i> View Interview Schedule</li>
+                    <li><i class="fas fa-check" style="color: green;"></i> Password Management</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-shield-alt"></i> For Admin
+                </h5>
+                <ul style="list-style: none; padding: 0;">
+                    <li><i class="fas fa-check" style="color: green;"></i> Manage Companies</li>
+                    <li><i class="fas fa-check" style="color: green;"></i> Post & Edit Jobs</li>
+                    <li><i class="fas fa-check" style="color: green;"></i> Monitor Applications</li>
+                    <li><i class="fas fa-check" style="color: green;"></i> Schedule Interviews</li>
+                    <li><i class="fas fa-check" style="color: green;"></i> Update Application Status</li>
+                    <li><i class="fas fa-check" style="color: green;"></i> View Placement Statistics</li>
+                    <li><i class="fas fa-check" style="color: green;"></i> Admin Dashboard</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How it Works Section -->
+<div class="row mt-5">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-cogs"></i> How It Works</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center mb-3">
+                        <div style="font-size: 3rem; color: #003366; margin-bottom: 15px;">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <h6>1. Register</h6>
+                        <p>Create your account and complete your profile</p>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <div style="font-size: 3rem; color: #0066cc; margin-bottom: 15px;">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <h6>2. Browse Jobs</h6>
+                        <p>Explore job opportunities from top companies</p>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <div style="font-size: 3rem; color: #003366; margin-bottom: 15px;">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h6>3. Apply</h6>
+                        <p>Submit your application for desired positions</p>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <div style="font-size: 3rem; color: #0066cc; margin-bottom: 15px;">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h6>4. Get Selected</h6>
+                        <p>Track interviews and secure placements</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Job Details - Placement Manager{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-9">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>{{ job.job_title }}</h4>
+                <p class="mb-0">{{ job.company.company_name }}</p>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <p>
+                            <strong><i class="fas fa-building"></i> Company:</strong> {{ job.company.company_name }}<br>
+                            <strong><i class="fas fa-map-marker-alt"></i> Location:</strong> {{ job.location }}<br>
+                            <strong><i class="fas fa-briefcase"></i> Job Type:</strong> <span class="badge bg-info">{{ job.get_job_type_display }}</span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p>
+                            <strong><i class="fas fa-star"></i> Minimum CGPA:</strong> <span class="badge bg-warning">{{ job.min_cgpa }}</span><br>
+                            <strong><i class="fas fa-calendar-alt"></i> Deadline:</strong> {{ job.deadline|date:"d M, Y" }}<br>
+                            <strong><i class="fas fa-money-bill-alt"></i> Package:</strong> <span class="badge bg-success">{{ job.company.package }} LPA</span>
+                        </p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <h5><i class="fas fa-file-alt"></i> Job Description</h5>
+                <div class="alert alert-light">
+                    {{ job.description }}
+                </div>
+
+                <hr>
+
+                <h5><i class="fas fa-phone-alt"></i> Contact Information</h5>
+                <p>
+                    <strong>HR Name:</strong> {{ job.company.hr_name }}<br>
+                    <strong>Email:</strong> <a href="mailto:{{ job.company.email }}">{{ job.company.email }}</a><br>
+                    <strong>Phone:</strong> {{ job.company.phone }}<br>
+                    {% if job.company.website %}
+                        <strong>Website:</strong> <a href="{{ job.company.website }}" target="_blank">{{ job.company.website }}</a>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-check-circle"></i> Eligibility Check</h5>
+            </div>
+            <div class="card-body">
+                <p>
+                    <strong>Your CGPA:</strong><br>
+                    <span class="badge bg-primary" style="font-size: 1.1rem;">{{ student.cgpa }}</span>
+                </p>
+                <p>
+                    <strong>Required CGPA:</strong><br>
+                    <span class="badge bg-warning" style="font-size: 1.1rem;">{{ job.min_cgpa }}</span>
+                </p>
+                <hr>
+                {% if is_eligible %}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> You are eligible!
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-times-circle"></i> You are not eligible for this job.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-paper-plane"></i> Apply for this Job</h5>
+            </div>
+            <div class="card-body">
+                {% if already_applied %}
+                    <div class="alert alert-info mb-3">
+                        <i class="fas fa-info-circle"></i> You have already applied for this job.
+                    </div>
+                    <a href="{% url 'student_applications' %}" class="btn btn-primary w-100">
+                        <i class="fas fa-eye"></i> View Application
+                    </a>
+                {% elif is_eligible %}
+                    <form method="POST" action="{% url 'apply_for_job' job.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2">
+                            <i class="fas fa-paper-plane"></i> Apply Now
+                        </button>
+                    </form>
+                    <a href="{% url 'job_list' %}" class="btn btn-secondary w-100">
+                        <i class="fas fa-arrow-left"></i> Back to Jobs
+                    </a>
+                {% else %}
+                    <div class="alert alert-danger mb-3">
+                        <strong>Sorry!</strong><br>
+                        You don't meet the minimum CGPA requirement.
+                    </div>
+                    <a href="{% url 'student_profile' %}" class="btn btn-primary w-100 mb-2">
+                        <i class="fas fa-edit"></i> Update Profile
+                    </a>
+                    <a href="{% url 'job_list' %}" class="btn btn-secondary w-100">
+                        <i class="fas fa-arrow-left"></i> Back to Jobs
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

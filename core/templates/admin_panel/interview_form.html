@@ -1,0 +1,88 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Schedule Interview - Placement Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-calendar-alt"></i> Schedule Interview</h4>
+                <p class="mb-0"><small>For: {{ application.student.user.get_full_name }} - {{ application.job.job_title }}</small></p>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="{{ form.interview_type.id_for_label }}" class="form-label">
+                            {{ form.interview_type.label }}
+                        </label>
+                        {{ form.interview_type }}
+                        {% if form.interview_type.errors %}
+                            <div class="invalid-feedback d-block">{{ form.interview_type.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.date.id_for_label }}" class="form-label">
+                                    {{ form.date.label }}
+                                </label>
+                                {{ form.date }}
+                                {% if form.date.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.date.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.time.id_for_label }}" class="form-label">
+                                    {{ form.time.label }}
+                                </label>
+                                {{ form.time }}
+                                {% if form.time.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.time.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.venue.id_for_label }}" class="form-label">
+                            {{ form.venue.label }}
+                        </label>
+                        {{ form.venue }}
+                        {% if form.venue.errors %}
+                            <div class="invalid-feedback d-block">{{ form.venue.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.notes.id_for_label }}" class="form-label">
+                            {{ form.notes.label }}
+                        </label>
+                        {{ form.notes }}
+                        {% if form.notes.errors %}
+                            <div class="invalid-feedback d-block">{{ form.notes.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check"></i> Schedule Interview
+                        </button>
+                    </div>
+                </form>
+
+                <hr>
+
+                <a href="{% url 'admin_interviews' %}" class="btn btn-secondary w-100">
+                    <i class="fas fa-arrow-left"></i> Back to Interviews
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

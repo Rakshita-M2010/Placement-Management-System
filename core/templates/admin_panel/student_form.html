@@ -1,0 +1,96 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Edit Student - Placement Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="fas fa-edit"></i> Edit Student Profile</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'admin_student_detail' student.id %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-user"></i> {{ student.user.get_full_name }}</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="id_roll_number" class="form-label">Roll Number</label>
+                    {{ form.roll_number }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_branch" class="form-label">Branch</label>
+                    {{ form.branch }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="id_cgpa" class="form-label">CGPA</label>
+                    {{ form.cgpa }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_phone" class="form-label">Phone</label>
+                    {{ form.phone }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="id_graduation_year" class="form-label">Graduation Year</label>
+                    {{ form.graduation_year }}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="id_skills" class="form-label">Skills (comma-separated)</label>
+                {{ form.skills }}
+                <small class="form-text text-muted">
+                    Enter skills separated by commas. Example: Python, Java, C++
+                </small>
+            </div>
+
+            <div class="mb-3">
+                <label for="id_resume" class="form-label">Resume</label>
+                {% if form.resume.value %}
+                    <div class="mb-2">
+                        <p class="mb-2">
+                            <strong>Current Resume:</strong> 
+                            <a href="{{ form.resume.value.url }}" target="_blank" class="btn btn-sm btn-info">
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                        </p>
+                    </div>
+                {% endif %}
+                {{ form.resume }}
+            </div>
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <a href="{% url 'admin_student_detail' student.id %}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

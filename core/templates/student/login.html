@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if request.GET.role == 'admin' %}Admin Login{% else %}Student Login{% endif %} - Placement Manager{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header" style="{% if request.GET.role == 'admin' %}background: linear-gradient(135deg, #003366 0%, #0066cc 100%); color: white;{% else %}background: linear-gradient(135deg, #003366 0%, #0066cc 100%); color: white;{% endif %}">
+                {% if request.GET.role == 'admin' %}
+                    <h4><i class="fas fa-lock"></i> Admin Login</h4>
+                    <small style="display: block; opacity: 0.9;">Secure administrator access</small>
+                {% else %}
+                    <h4><i class="fas fa-sign-in-alt"></i> Student Login</h4>
+                    <small style="display: block; opacity: 0.9;">Access your placement account</small>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="{{ form.username.id_for_label }}" class="form-label">
+                            Email Address
+                        </label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.username.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.password.id_for_label }}" class="form-label">
+                            Password
+                        </label>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.password.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-sign-in-alt"></i> {% if request.GET.role == 'admin' %}Admin Login{% else %}Student Login{% endif %}
+                    </button>
+                </form>
+
+                <hr>
+                {% if request.GET.role == 'admin' %}
+                    <p class="text-center mb-2">
+                        <a href="{% url 'login' %}?role=student" class="text-decoration-none">
+                            <i class="fas fa-arrow-left"></i> Back to Student Login
+                        </a>
+                    </p>
+                {% else %}
+                    <p class="text-center mb-2">
+                        Don't have an account?
+                        <a href="{% url 'register' %}">Register here</a>
+                    </p>
+                    <p class="text-center">
+                        <a href="{% url 'login' %}?role=admin" class="text-decoration-none">
+                            <i class="fas fa-lock"></i> Admin Login
+                        </a>
+                    </p>
+                {% endif %}
+                
+                <p class="text-center text-muted mt-3">
+                    <a href="/" class="text-decoration-none text-muted">
+                        <i class="fas fa-home"></i> Back to Home
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

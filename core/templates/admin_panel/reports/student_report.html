@@ -1,0 +1,157 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+
+{% block title %}Student Reports - Placement Management System{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="dashboard-header mb-4">
+    <h1><i class="fas fa-graduation-cap"></i> Student Reports</h1>
+    <div class="dashboard-meta">
+        <div class="meta-item">
+            <span>Search, filter, and analyze student placement data</span>
+        </div>
+    </div>
+</div>
+
+<!-- Search & Filter Section -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-filter"></i> Search & Filter
+    </div>
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" class="form-control" name="search" placeholder="Search by name or roll number" value="{{ search_query }}">
+            </div>
+            <div class="col-md-2">
+                <select class="form-control" name="branch">
+                    <option value="">All Branches</option>
+                    {% for code, name in branches %}
+                        <option value="{{ code }}" {% if branch_filter == code %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="number" class="form-control" name="cgpa" placeholder="Min CGPA" step="0.01" value="{{ cgpa_filter }}">
+            </div>
+            <div class="col-md-2">
+                <select class="form-control" name="graduation_year">
+                    <option value="">All Years</option>
+                    {% for year in graduation_years %}
+                        <option value="{{ year }}" {% if year_filter == year %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Export Buttons -->
+<div class="mb-3">
+    <a href="?{{ request.GET.urlencode }}&export=csv" class="btn btn-success btn-sm"><i class="fas fa-download"></i> Export CSV</a>
+    <a href="?{{ request.GET.urlencode }}&export=excel" class="btn btn-info btn-sm"><i class="fas fa-download"></i> Export Excel</a>
+    <a href="{% url 'admin_reports' %}" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
+</div>
+
+<!-- Students Table -->
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-table"></i> Student List ({{ page_obj.paginator.count }} records)
+    </div>
+    <div class="card-body">
+        {% if page_obj %}
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Roll No.</th>
+                            <th>Branch</th>
+                            <th>CGPA</th>
+                            <th>Graduation Year</th>
+                            <th>Placement Status</th>
+                            <th>Company</th>
+                            <th>Package (LPA)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in page_obj %}
+                            <tr>
+                                <td><strong>{{ item.student.user.get_full_name }}</strong></td>
+                                <td>{{ item.student.roll_number }}</td>
+                                <td><span class="badge bg-secondary">{{ item.student.branch }}</span></td>
+                                <td>{{ item.student.cgpa }}</td>
+                                <td>{{ item.student.graduation_year }}</td>
+                                <td>
+                                    {% if item.placed %}
+                                        <span class="badge bg-success"><i class="fas fa-check"></i> Placed</span>
+                                    {% else %}
+                                        <span class="badge bg-danger"><i class="fas fa-times"></i> Not Placed</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ item.company }}</td>
+                                <td>
+                                    {% if item.package %}
+                                        <strong>₹{{ item.package }}</strong>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox"></i> No students found matching your criteria
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1&{{ request.GET.urlencode }}">First</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">Previous</a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num }}&{{ request.GET.urlencode }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">Next</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&{{ request.GET.urlencode }}">Last</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle"></i> No students found in the system.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

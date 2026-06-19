@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Placement Results - Placement Management{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="display-5 fw-bold" style="color: #2c3e50;">
+                <i class="fas fa-star text-warning"></i> My Placement Results
+            </h2>
+            <p class="text-muted">View your placement offers and selected companies</p>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if placement_results %}
+                <span class="badge bg-success" style="font-size: 14px;">{{ placement_results.count }} Result(s)</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Results Display -->
+    <div class="row">
+        {% if placement_results %}
+            <!-- Selected/Placed Cards -->
+            {% for result in placement_results %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    {% if result.status == 'Selected' %}
+                        <!-- Success Card -->
+                        <div class="card border-0 shadow-sm h-100" style="border-top: 4px solid #28a745; border-radius: 8px;">
+                            <div class="card-body" style="background: linear-gradient(135deg, #f0f9f4 0%, #ffffff 100%);">
+                                <!-- Celebration Badge -->
+                                <div class="text-center mb-3">
+                                    <div style="font-size: 48px;">🎉</div>
+                                    <h5 class="card-title text-success fw-bold mt-2">Congratulations!</h5>
+                                </div>
+
+                                <!-- Company Info -->
+                                <div class="text-center mb-3">
+                                    <h6 class="card-subtitle mb-2" style="color: #2c3e50; font-weight: 600;">
+                                        {{ result.company.company_name }}
+                                    </h6>
+                                    <p class="text-muted mb-2" style="font-size: 14px;">
+                                        <i class="fas fa-briefcase"></i> {{ result.job.job_title }}
+                                    </p>
+                                </div>
+
+                                <!-- Package Info -->
+                                <div class="alert alert-success mb-3" style="background-color: #d4edda; border-color: #c3e6cb;">
+                                    <h4 class="alert-heading mb-0" style="font-size: 24px; font-weight: bold; color: #155724;">
+                                        ₹ {{ result.package_offered|floatformat:2 }} LPA
+                                    </h4>
+                                </div>
+
+                                <!-- Details -->
+                                <div class="details-section">
+                                    <div class="detail-item mb-2">
+                                        <small class="text-muted">Selection Date</small>
+                                        <p class="mb-0" style="color: #2c3e50; font-weight: 500;">
+                                            <i class="fas fa-calendar-alt"></i> {{ result.selection_date|date:"M d, Y" }}
+                                        </p>
+                                    </div>
+
+                                    <div class="detail-item mb-2">
+                                        <small class="text-muted">Published Date</small>
+                                        <p class="mb-0" style="color: #2c3e50; font-weight: 500;">
+                                            <i class="fas fa-hourglass-end"></i> {{ result.published_date|date:"M d, Y" }}
+                                        </p>
+                                    </div>
+
+                                    <div class="detail-item">
+                                        <small class="text-muted">Status</small>
+                                        <p class="mb-0">
+                                            <span class="badge bg-success" style="font-size: 12px; padding: 6px 10px;">
+                                                <i class="fas fa-check-circle"></i> PLACED
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Company Details -->
+                                <hr class="my-3">
+                                <div class="company-info">
+                                    <p class="mb-2" style="font-size: 13px;">
+                                        <strong>HR Contact:</strong><br>
+                                        {{ result.company.hr_name }}<br>
+                                        <i class="fas fa-envelope"></i> {{ result.company.email }}<br>
+                                        <i class="fas fa-phone"></i> {{ result.company.phone }}
+                                    </p>
+                                    {% if result.company.website %}
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            <a href="{{ result.company.website }}" target="_blank" class="text-primary">
+                                                <i class="fas fa-globe"></i> Visit Company Website
+                                            </a>
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% elif result.status == 'Rejected' %}
+                        <!-- Rejection Card -->
+                        <div class="card border-0 shadow-sm h-100" style="border-top: 4px solid #dc3545; border-radius: 8px;">
+                            <div class="card-body" style="background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);">
+                                <!-- Icon -->
+                                <div class="text-center mb-3">
+                                    <i class="fas fa-times-circle text-danger" style="font-size: 48px;"></i>
+                                    <h5 class="card-title text-danger fw-bold mt-2">Not Selected</h5>
+                                </div>
+
+                                <!-- Company Info -->
+                                <div class="text-center mb-3">
+                                    <h6 class="card-subtitle mb-2" style="color: #2c3e50; font-weight: 600;">
+                                        {{ result.company.company_name }}
+                                    </h6>
+                                    <p class="text-muted mb-2" style="font-size: 14px;">
+                                        <i class="fas fa-briefcase"></i> {{ result.job.job_title }}
+                                    </p>
+                                </div>
+
+                                <!-- Status Badge -->
+                                <div class="text-center mb-3">
+                                    <span class="badge bg-danger" style="font-size: 12px; padding: 8px 12px;">
+                                        <i class="fas fa-times-circle"></i> NOT SELECTED
+                                    </span>
+                                </div>
+
+                                <!-- Details -->
+                                <div class="details-section">
+                                    <div class="detail-item mb-2">
+                                        <small class="text-muted">Rejection Date</small>
+                                        <p class="mb-0" style="color: #2c3e50; font-weight: 500;">
+                                            <i class="fas fa-calendar-alt"></i> {{ result.selection_date|date:"M d, Y" }}
+                                        </p>
+                                    </div>
+
+                                    <div class="detail-item">
+                                        <small class="text-muted">Published Date</small>
+                                        <p class="mb-0" style="color: #2c3e50; font-weight: 500;">
+                                            <i class="fas fa-hourglass-end"></i> {{ result.published_date|date:"M d, Y" }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Encouragement Message -->
+                                <hr class="my-3">
+                                <div class="alert alert-info mb-0" style="font-size: 13px;">
+                                    <i class="fas fa-lightbulb"></i> Keep applying! There are more opportunities ahead.
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <!-- Summary Section -->
+            {% if selected_count > 0 or rejected_count > 0 %}
+                <div class="col-12 mt-4">
+                    <div class="row">
+                        {% if selected_count > 0 %}
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow-sm text-center">
+                                    <div class="card-body" style="background: linear-gradient(135deg, #d4edda 0%, #ffffff 100%);">
+                                        <h3 class="text-success fw-bold mb-2">{{ selected_count }}</h3>
+                                        <p class="text-muted mb-0">Placement(s) Secured</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if rejected_count > 0 %}
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow-sm text-center">
+                                    <div class="card-body" style="background: linear-gradient(135deg, #f8d7da 0%, #ffffff 100%);">
+                                        <h3 class="text-danger fw-bold mb-2">{{ rejected_count }}</h3>
+                                        <p class="text-muted mb-0">Not Selected</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if selected_count > 0 %}
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow-sm text-center">
+                                    <div class="card-body" style="background: linear-gradient(135deg, #d1ecf1 0%, #ffffff 100%);">
+                                        <h3 class="text-info fw-bold mb-2">₹ {{ highest_package|floatformat:2 }} LPA</h3>
+                                        <p class="text-muted mb-0">Highest Package</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Navigation -->
+            <div class="col-12 mt-4">
+                <a href="{% url 'job_list' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-briefcase"></i> Continue Applying
+                </a>
+                <a href="{% url 'student_applications' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-file-alt"></i> View Applications
+                </a>
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="col-md-8 offset-md-2">
+                <div class="card border-0 shadow-sm text-center py-5">
+                    <div class="card-body">
+                        <i class="fas fa-inbox text-muted" style="font-size: 64px; opacity: 0.5;"></i>
+                        <h5 class="mt-4 text-muted">No Placement Results Yet</h5>
+                        <p class="text-muted mb-4">
+                            Placement results will appear here once they are published by the admin after applications are processed.
+                        </p>
+                        
+                        <!-- Status Tracker -->
+                        <div class="card border-light mt-4">
+                            <div class="card-body" style="background-color: #f8f9fa;">
+                                <h6 class="fw-bold text-start mb-3">Your Application Journey:</h6>
+                                <div class="timeline">
+                                    <div class="timeline-item mb-3 text-start">
+                                        <i class="fas fa-file-alt text-primary" style="font-size: 18px;"></i>
+                                        <span class="ms-2"><strong>Apply:</strong> Submit applications to jobs</span>
+                                    </div>
+                                    <div class="timeline-item mb-3 text-start">
+                                        <i class="fas fa-check-circle text-success" style="font-size: 18px;"></i>
+                                        <span class="ms-2"><strong>Shortlist:</strong> Get shortlisted for interviews</span>
+                                    </div>
+                                    <div class="timeline-item mb-3 text-start">
+                                        <i class="fas fa-calendar-alt text-warning" style="font-size: 18px;"></i>
+                                        <span class="ms-2"><strong>Interview:</strong> Attend interview rounds</span>
+                                    </div>
+                                    <div class="timeline-item text-start">
+                                        <i class="fas fa-star text-info" style="font-size: 18px;"></i>
+                                        <span class="ms-2"><strong>Results:</strong> View placement results here</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'job_list' %}" class="btn btn-primary mt-4">
+                            <i class="fas fa-briefcase"></i> Browse Available Jobs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Styles -->
+<style>
+    .detail-item {
+        padding: 8px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .detail-item:last-child {
+        border-bottom: none;
+    }
+
+    .timeline-item {
+        padding: 8px 0;
+    }
+
+    .card {
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+        .col-lg-4 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}

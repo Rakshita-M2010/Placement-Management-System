@@ -1,0 +1,166 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+
+{% block title %}Application Reports - Placement Management System{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="dashboard-header mb-4">
+    <h1><i class="fas fa-file-alt"></i> Application Status Reports</h1>
+    <div class="dashboard-meta">
+        <div class="meta-item">
+            <span>Track and analyze applications by status, company, and date</span>
+        </div>
+    </div>
+</div>
+
+<!-- Status Breakdown Cards -->
+<h5 class="section-title"><i class="fas fa-list-check"></i> Application Status Summary</h5>
+<div class="row mb-4">
+    {% for status, count in status_breakdown.items %}
+        <div class="col-md-2 mb-2">
+            <div class="card text-center">
+                <div class="card-body p-3">
+                    <div class="h3 mb-2">{{ count }}</div>
+                    <small class="text-muted">{{ status }}</small>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Filter Section -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-filter"></i> Filter Applications
+    </div>
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-3">
+                <select class="form-control" name="status">
+                    <option value="all">All Status</option>
+                    {% for status in statuses %}
+                        <option value="{{ status }}" {% if status_filter == status %}selected{% endif %}>{{ status }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-control" name="company">
+                    <option value="">All Companies</option>
+                    {% for company in companies %}
+                        <option value="{{ company.id }}" {% if company_filter == company.id|stringformat:"s" %}selected{% endif %}>{{ company.company_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="date" class="form-control" name="date_from" value="{{ date_from }}" placeholder="From Date">
+            </div>
+            <div class="col-md-2">
+                <input type="date" class="form-control" name="date_to" value="{{ date_to }}" placeholder="To Date">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Export Buttons -->
+<div class="mb-3">
+    <a href="?{{ request.GET.urlencode }}&export=csv" class="btn btn-success btn-sm"><i class="fas fa-download"></i> Export CSV</a>
+    <a href="?{{ request.GET.urlencode }}&export=excel" class="btn btn-info btn-sm"><i class="fas fa-download"></i> Export Excel</a>
+    <a href="{% url 'admin_reports' %}" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
+</div>
+
+<!-- Applications Table -->
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-table"></i> Applications ({{ page_obj.paginator.count }} total)
+    </div>
+    <div class="card-body">
+        {% if page_obj %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Roll No.</th>
+                            <th>Company</th>
+                            <th>Job Title</th>
+                            <th>Status</th>
+                            <th>Applied Date</th>
+                            <th>Last Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for application in page_obj %}
+                            <tr>
+                                <td><strong>{{ application.student.user.get_full_name }}</strong></td>
+                                <td>{{ application.student.roll_number }}</td>
+                                <td>{{ application.job.company.company_name }}</td>
+                                <td>{{ application.job.job_title }}</td>
+                                <td>
+                                    <span class="badge" style="
+                                        {% if application.status == 'Selected' %}background-color: #2E7D32;
+                                        {% elif application.status == 'Interview Scheduled' %}background-color: #1976D2;
+                                        {% elif application.status == 'Shortlisted' %}background-color: #F9A825; color: #333;
+                                        {% elif application.status == 'Rejected' %}background-color: #D32F2F;
+                                        {% else %}background-color: #666;{% endif %}
+                                    ">{{ application.status }}</span>
+                                </td>
+                                <td>{{ application.applied_date|date:"Y-m-d H:i" }}</td>
+                                <td>{{ application.updated_at|date:"Y-m-d H:i" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox"></i> No applications found matching your filters
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1&{{ request.GET.urlencode }}">First</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">Previous</a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num }}&{{ request.GET.urlencode }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">Next</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&{{ request.GET.urlencode }}">Last</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle"></i> No applications found.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

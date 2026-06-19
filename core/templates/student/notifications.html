@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Notifications - Placement Management{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="display-5 fw-bold" style="color: #2c3e50;">
+                <i class="fas fa-bell text-primary"></i> My Notifications
+            </h2>
+            <p class="text-muted">Stay updated with all important placement notifications</p>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if page_obj %}
+                <span class="badge bg-info" id="total-notifications">{{ total_notifications }} Total</span>
+                <span class="badge bg-warning" id="unread-badge">{{ unread_count }} Unread</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Notification List -->
+    <div class="row">
+        <div class="col-md-12">
+            {% if page_obj %}
+                <!-- Notifications Container -->
+                <div class="notification-list">
+                    {% for notification in page_obj %}
+                        <div class="notification-card {% if not notification.is_read %}unread{% endif %} mb-3" 
+                             data-notification-id="{{ notification.id }}"
+                             style="border-left: 4px solid {% if notification.notification_type == 'selected' %}#28a745{% elif notification.notification_type == 'rejected' %}#dc3545{% elif notification.notification_type == 'shortlisted' %}#007bff{% elif notification.notification_type == 'interview_scheduled' %}#ffc107{% else %}#6c757d{% endif %};">
+                            
+                            <div class="card border-0 shadow-sm" style="border-radius: 8px;">
+                                <div class="card-body">
+                                    <div class="row align-items-start">
+                                        <!-- Icon Section -->
+                                        <div class="col-auto">
+                                            <div class="notification-icon" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                                                {% if notification.notification_type == 'job_posted' %}
+                                                    <i class="fas fa-briefcase" style="font-size: 24px; color: #007bff;"></i>
+                                                {% elif notification.notification_type == 'shortlisted' %}
+                                                    <i class="fas fa-check-circle" style="font-size: 24px; color: #28a745;"></i>
+                                                {% elif notification.notification_type == 'interview_scheduled' %}
+                                                    <i class="fas fa-calendar-alt" style="font-size: 24px; color: #ffc107;"></i>
+                                                {% elif notification.notification_type == 'rejected' %}
+                                                    <i class="fas fa-times-circle" style="font-size: 24px; color: #dc3545;"></i>
+                                                {% elif notification.notification_type == 'selected' %}
+                                                    <i class="fas fa-trophy" style="font-size: 24px; color: #28a745;"></i>
+                                                {% elif notification.notification_type == 'result_published' %}
+                                                    <i class="fas fa-star" style="font-size: 24px; color: #ffc107;"></i>
+                                                {% else %}
+                                                    <i class="fas fa-bell" style="font-size: 24px; color: #6c757d;"></i>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <!-- Content Section -->
+                                        <div class="col">
+                                            <!-- Title -->
+                                            <h6 class="card-title fw-bold mb-1" style="color: #2c3e50; font-size: 16px;">
+                                                {{ notification.title }}
+                                                {% if not notification.is_read %}
+                                                    <span class="badge bg-primary ms-2">New</span>
+                                                {% endif %}
+                                            </h6>
+
+                                            <!-- Message -->
+                                            <p class="card-text text-muted mb-2" style="font-size: 14px;">
+                                                {{ notification.message }}
+                                            </p>
+
+                                            <!-- Timestamp & Details -->
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock"></i> 
+                                                    {{ notification.created_at|date:"M d, Y g:i A" }}
+                                                </small>
+                                                
+                                                <!-- Action Buttons -->
+                                                <div class="btn-group btn-group-sm">
+                                                    {% if not notification.is_read %}
+                                                        <button class="btn btn-outline-primary btn-sm mark-read-btn" 
+                                                                onclick="markAsRead({{ notification.id }})">
+                                                            <i class="fas fa-envelope-open-text"></i> Mark as Read
+                                                        </button>
+                                                    {% endif %}
+                                                    
+                                                    <!-- View Related Content Button -->
+                                                    {% if notification.job %}
+                                                        <a href="{% url 'job_detail' notification.job.id %}" class="btn btn-outline-info btn-sm">
+                                                            <i class="fas fa-external-link-alt"></i> View Job
+                                                        </a>
+                                                    {% elif notification.application %}
+                                                        <a href="{% url 'student_applications' %}" class="btn btn-outline-info btn-sm">
+                                                            <i class="fas fa-external-link-alt"></i> View Application
+                                                        </a>
+                                                    {% elif notification.placement_result %}
+                                                        <a href="{% url 'student_placement_results' %}" class="btn btn-outline-info btn-sm">
+                                                            <i class="fas fa-external-link-alt"></i> View Results
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if is_paginated %}
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1"><i class="fas fa-angle-double-left"></i> First</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                        <i class="fas fa-angle-left"></i> Previous
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            <!-- Page Numbers -->
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                        Next <i class="fas fa-angle-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                                        Last <i class="fas fa-angle-double-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <!-- Empty State -->
+                <div class="card border-0 shadow-sm text-center py-5">
+                    <div class="card-body">
+                        <i class="fas fa-inbox text-muted" style="font-size: 64px; opacity: 0.5;"></i>
+                        <h5 class="mt-4 text-muted">No Notifications Yet</h5>
+                        <p class="text-muted mb-4">
+                            You'll receive notifications when new opportunities are posted, 
+                            your applications are shortlisted, interviews are scheduled, or placement results are published.
+                        </p>
+                        <a href="{% url 'job_list' %}" class="btn btn-primary">
+                            <i class="fas fa-briefcase"></i> Browse Jobs
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Styles for Notifications -->
+<style>
+    .notification-card {
+        border-left: 4px solid #dee2e6;
+        padding-left: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .notification-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+        transform: translateY(-2px);
+    }
+
+    .notification-card.unread {
+        background-color: #f8f9fa;
+    }
+
+    .notification-icon {
+        background-color: #f0f4f8;
+    }
+
+    .mark-read-btn {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    .btn-group-sm > .btn {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .notification-card .btn-group {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .notification-card .btn-group > .btn {
+            flex: 1;
+        }
+    }
+</style>
+
+<!-- JavaScript for marking as read -->
+<script>
+    function markAsRead(notificationId) {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch(`/notifications/${notificationId}/read/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update UI - remove "New" badge and update card styling
+                const card = document.querySelector(`[data-notification-id="${notificationId}"]`);
+                if (card) {
+                    card.classList.remove('unread');
+                    const badge = card.querySelector('.badge');
+                    if (badge) {
+                        badge.remove();
+                    }
+                }
+                
+                // Update unread count in badge
+                const unreadBadge = document.getElementById('unread-badge');
+                if (unreadBadge) {
+                    const count = parseInt(unreadBadge.textContent) - 1;
+                    unreadBadge.textContent = count + ' Unread';
+                }
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Update unread count every 30 seconds
+    setInterval(function() {
+        fetch('/api/notifications/unread-count/')
+            .then(response => response.json())
+            .then(data => {
+                const badge = document.getElementById('unread-badge');
+                if (badge) {
+                    badge.textContent = data.unread_count + ' Unread';
+                }
+            })
+            .catch(error => console.error('Error fetching unread count:', error));
+    }, 30000);
+</script>
+{% endblock %}

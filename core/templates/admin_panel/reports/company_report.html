@@ -1,0 +1,140 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+
+{% block title %}Company Reports - Placement Management System{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="dashboard-header mb-4">
+    <h1><i class="fas fa-building"></i> Company Reports</h1>
+    <div class="dashboard-meta">
+        <div class="meta-item">
+            <span>Total applicants, selections, and package analysis per company</span>
+        </div>
+    </div>
+</div>
+
+<!-- Search & Sort Section -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-filter"></i> Search & Sort
+    </div>
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-6">
+                <input type="text" class="form-control" name="search" placeholder="Search by company name" value="{{ search_query }}">
+            </div>
+            <div class="col-md-4">
+                <select class="form-control" name="sort">
+                    <option value="-total_applicants" {% if sort_by == '-total_applicants' %}selected{% endif %}>Most Applicants</option>
+                    <option value="-selected" {% if sort_by == '-selected' %}selected{% endif %}>Most Selected</option>
+                    <option value="-package" {% if sort_by == '-package' %}selected{% endif %}>Highest Package</option>
+                    <option value="company_name" {% if sort_by == 'company_name' %}selected{% endif %}>By Name (A-Z)</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Export Buttons -->
+<div class="mb-3">
+    <a href="?{{ request.GET.urlencode }}&export=csv" class="btn btn-success btn-sm"><i class="fas fa-download"></i> Export CSV</a>
+    <a href="?{{ request.GET.urlencode }}&export=excel" class="btn btn-info btn-sm"><i class="fas fa-download"></i> Export Excel</a>
+    <a href="{% url 'admin_reports' %}" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
+</div>
+
+<!-- Companies Table -->
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-table"></i> Company Statistics ({{ page_obj.paginator.count }} companies)
+    </div>
+    <div class="card-body">
+        {% if page_obj %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Company Name</th>
+                            <th>Package (LPA)</th>
+                            <th>Total Applicants</th>
+                            <th>Shortlisted</th>
+                            <th>Interviewed</th>
+                            <th>Selected</th>
+                            <th>Rejected</th>
+                            <th>Selection Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for company in page_obj %}
+                            <tr>
+                                <td><strong>{{ company.company_name }}</strong></td>
+                                <td>₹{{ company.package }}</td>
+                                <td>{{ company.total_applicants }}</td>
+                                <td>{{ company.shortlisted }}</td>
+                                <td>{{ company.interviewed }}</td>
+                                <td>{{ company.selected }}</td>
+                                <td>{{ company.rejected }}</td>
+                                <td>
+                                    {% if company.total_applicants > 0 %}
+                                        {{ company.selected|add:0 }}%
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox"></i> No companies found
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1&{{ request.GET.urlencode }}">First</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">Previous</a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num }}&{{ request.GET.urlencode }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">Next</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&{{ request.GET.urlencode }}">Last</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle"></i> No companies found in the system.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

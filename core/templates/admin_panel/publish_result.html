@@ -1,0 +1,318 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+
+{% block title %}Publish Placement Result - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="display-5 fw-bold" style="color: #2c3e50;">
+                <i class="fas fa-check-circle text-success"></i> Publish Placement Result
+            </h2>
+            <p class="text-muted">Update and publish the placement outcome for this application</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+        <!-- Applicant Information Card -->
+        <div class="col-md-5 mb-4">
+            <div class="card border-0 shadow-sm" style="border-top: 4px solid #1976D2; border-radius: 8px;">
+                <div class="card-header" style="background-color: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+                    <h6 class="mb-0" style="color: #2c3e50; font-weight: 600;">
+                        <i class="fas fa-user"></i> Applicant Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <!-- Student Name -->
+                    <div class="info-item mb-3">
+                        <label class="form-label text-muted" style="font-size: 12px; font-weight: 600;">Full Name</label>
+                        <p class="mb-0" style="color: #2c3e50; font-weight: 500; font-size: 16px;">
+                            {{ application.student.user.get_full_name }}
+                        </p>
+                    </div>
+
+                    <!-- Roll Number -->
+                    <div class="info-item mb-3">
+                        <label class="form-label text-muted" style="font-size: 12px; font-weight: 600;">Roll Number</label>
+                        <p class="mb-0" style="color: #2c3e50; font-weight: 500;">
+                            {{ application.student.roll_number }}
+                        </p>
+                    </div>
+
+                    <!-- Branch -->
+                    <div class="info-item mb-3">
+                        <label class="form-label text-muted" style="font-size: 12px; font-weight: 600;">Branch</label>
+                        <p class="mb-0" style="color: #2c3e50; font-weight: 500;">
+                            {{ application.student.branch }}
+                        </p>
+                    </div>
+
+                    <!-- CGPA -->
+                    <div class="info-item mb-3">
+                        <label class="form-label text-muted" style="font-size: 12px; font-weight: 600;">CGPA</label>
+                        <p class="mb-0" style="color: #2c3e50; font-weight: 500;">
+                            {{ application.student.cgpa }}
+                        </p>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="info-item mb-3">
+                        <label class="form-label text-muted" style="font-size: 12px; font-weight: 600;">Email</label>
+                        <p class="mb-0" style="color: #2c3e50; font-weight: 500;">
+                            <i class="fas fa-envelope"></i> {{ application.student.user.email }}
+                        </p>
+                    </div>
+
+                    <div class="info-item">
+                        <label class="form-label text-muted" style="font-size: 12px; font-weight: 600;">Phone</label>
+                        <p class="mb-0" style="color: #2c3e50; font-weight: 500;">
+                            <i class="fas fa-phone"></i> {{ application.student.phone }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Job & Company Information Card -->
+        <div class="col-md-7 mb-4">
+            <div class="card border-0 shadow-sm" style="border-top: 4px solid #1976D2; border-radius: 8px;">
+                <div class="card-header" style="background-color: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+                    <h6 class="mb-0" style="color: #2c3e50; font-weight: 600;">
+                        <i class="fas fa-briefcase"></i> Job & Company Details
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <!-- Company Name -->
+                    <div class="info-item mb-3">
+                        <label class="form-label text-muted" style="font-size: 12px; font-weight: 600;">Company Name</label>
+                        <p class="mb-0" style="color: #2c3e50; font-weight: 500; font-size: 16px;">
+                            {{ application.job.company.company_name }}
+                        </p>
+                    </div>
+
+                    <!-- Job Title -->
+                    <div class="info-item mb-3">
+                        <label class="form-label text-muted" style="font-size: 12px; font-weight: 600;">Job Title</label>
+                        <p class="mb-0" style="color: #2c3e50; font-weight: 500;">
+                            {{ application.job.job_title }}
+                        </p>
+                    </div>
+
+                    <!-- Job Type & Location -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item mb-3">
+                                <label class="form-label text-muted" style="font-size: 12px; font-weight: 600;">Job Type</label>
+                                <p class="mb-0" style="color: #2c3e50; font-weight: 500;">
+                                    {{ application.job.job_type }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item mb-3">
+                                <label class="form-label text-muted" style="font-size: 12px; font-weight: 600;">Location</label>
+                                <p class="mb-0" style="color: #2c3e50; font-weight: 500;">
+                                    {{ application.job.location }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Company Package -->
+                    <div class="info-item mb-3">
+                        <label class="form-label text-muted" style="font-size: 12px; font-weight: 600;">CTC Offered by Company</label>
+                        <p class="mb-0" style="color: #2c3e50; font-weight: 500; font-size: 16px;">
+                            <i class="fas fa-rupee-sign"></i> {{ application.job.company.package }} LPA
+                        </p>
+                    </div>
+
+                    <!-- Application Date -->
+                    <div class="info-item">
+                        <label class="form-label text-muted" style="font-size: 12px; font-weight: 600;">Application Date</label>
+                        <p class="mb-0" style="color: #2c3e50; font-weight: 500;">
+                            <i class="fas fa-calendar-alt"></i> {{ application.applied_date|date:"M d, Y" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Publication Form -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm" style="border-top: 4px solid #28a745; border-radius: 8px;">
+                <div class="card-header" style="background-color: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+                    <h6 class="mb-0" style="color: #2c3e50; font-weight: 600;">
+                        <i class="fas fa-edit"></i> Placement Result Details
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="needs-validation">
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <!-- Status Field (Auto-populated) -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.status.id_for_label }}" class="form-label fw-bold">
+                                    Result Status <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background-color: #f8f9fa;">
+                                        <i class="fas fa-check-circle"></i>
+                                    </span>
+                                    {{ form.status }}
+                                </div>
+                                {% if form.status.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.status.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="text-success d-block mt-2">
+                                    <i class="fas fa-check-circle"></i> <strong>Auto-populated from application status</strong> - cannot be changed
+                                </small>
+                            </div>
+
+                            <!-- Selection Date (Auto-set to Today) -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-calendar-check text-success"></i> Selection Date
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background-color: #e8f5e9;">
+                                        <i class="fas fa-calendar-alt text-success"></i>
+                                    </span>
+                                    <input type="text" class="form-control" value="{{ today_date|date:'M d, Y' }}" disabled style="background-color: #f8f9fa;">
+                                </div>
+                                <small class="text-success d-block mt-2">
+                                    <i class="fas fa-check-circle"></i> <strong>Auto-set to today's date</strong> - will be recorded when result is published
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Package Offered (Conditional) -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.package_offered.id_for_label }}" class="form-label fw-bold">
+                                    Package Offered (LPA)
+                                    <span id="package-required-badge" class="badge bg-danger" style="display: none;">Required if Selected</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background-color: #f8f9fa;">
+                                        <i class="fas fa-rupee-sign"></i>
+                                    </span>
+                                    {{ form.package_offered }}
+                                </div>
+                                {% if form.package_offered.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.package_offered.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="text-muted d-block mt-2">
+                                    <i class="fas fa-lightbulb text-warning"></i> <strong>Pre-filled with company's CTC ({{ company_package }} LPA)</strong> - 
+                                    Edit to override if different offer is given. Leave empty if rejected.
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <button type="submit" class="btn btn-success btn-lg" style="border-radius: 6px;">
+                                    <i class="fas fa-save"></i> Publish Result
+                                </button>
+                                <a href="{% url 'admin_applications' %}" class="btn btn-secondary btn-lg" style="border-radius: 6px;">
+                                    <i class="fas fa-arrow-left"></i> Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Alert -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <i class="fas fa-info-circle"></i> <strong>Publishing Placement Result:</strong>
+                <ul class="mb-0 mt-2">
+                    <li>The selection date will be automatically set to today's date ({{ today_date|date:"M d, Y" }})</li>
+                    <li>This result will be marked as <strong>published and final</strong></li>
+                    <li>The student will receive a notification with all placement details</li>
+                    <li>Published results can be revoked if needed, with a logged reason</li>
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Styles -->
+<style>
+    .form-control, .form-select {
+        border-color: #dee2e6;
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #1976D2;
+        box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.25);
+    }
+
+    .input-group-text {
+        border-color: #dee2e6;
+    }
+
+    .info-item {
+        padding-bottom: 8px;
+    }
+
+    .form-label {
+        color: #2c3e50;
+        margin-bottom: 8px;
+    }
+
+    .btn-lg {
+        padding: 12px 24px;
+        font-weight: 500;
+    }
+
+    .card {
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    }
+</style>
+
+<!-- JavaScript for conditional validation -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const statusSelect = document.getElementById('{{ form.status.id_for_label }}');
+        const packageInput = document.getElementById('{{ form.package_offered.id_for_label }}');
+        const packageBadge = document.getElementById('package-required-badge');
+
+        // Update package field requirement based on status
+        function updatePackageRequirement() {
+            if (statusSelect.value === 'Selected') {
+                packageInput.required = true;
+                packageBadge.style.display = 'inline-block';
+                packageInput.parentElement.parentElement.querySelector('label').innerHTML += ' <span class="text-danger">*</span>';
+            } else {
+                packageInput.required = false;
+                packageBadge.style.display = 'none';
+            }
+        }
+
+        statusSelect.addEventListener('change', updatePackageRequirement);
+        updatePackageRequirement(); // Initialize on load
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - Placement Manager{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-id-card"></i> My Profile</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+
+                    <h5 class="mb-3"><i class="fas fa-user"></i> Personal Information</h5>
+                    <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
+                    <p><strong>Email:</strong> {{ student.user.email }}</p>
+
+                    <hr>
+
+                    <h5 class="mb-3"><i class="fas fa-graduation-cap"></i> Academic Details</h5>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.roll_number.id_for_label }}" class="form-label">
+                                    {{ form.roll_number.label }}
+                                </label>
+                                {{ form.roll_number }}
+                                {% if form.roll_number.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.roll_number.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.branch.id_for_label }}" class="form-label">
+                                    {{ form.branch.label }}
+                                </label>
+                                {{ form.branch }}
+                                {% if form.branch.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.branch.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.cgpa.id_for_label }}" class="form-label">
+                                    {{ form.cgpa.label }}
+                                </label>
+                                {{ form.cgpa }}
+                                {% if form.cgpa.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.cgpa.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.graduation_year.id_for_label }}" class="form-label">
+                                    {{ form.graduation_year.label }}
+                                </label>
+                                {{ form.graduation_year }}
+                                {% if form.graduation_year.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.graduation_year.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h5 class="mb-3"><i class="fas fa-phone"></i> Contact Information</h5>
+
+                    <div class="form-group">
+                        <label for="{{ form.phone.id_for_label }}" class="form-label">
+                            {{ form.phone.label }}
+                        </label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}
+                            <div class="invalid-feedback d-block">{{ form.phone.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <hr>
+
+                    <h5 class="mb-3"><i class="fas fa-briefcase"></i> Professional Information</h5>
+
+                    <div class="form-group">
+                        <label for="{{ form.skills.id_for_label }}" class="form-label">
+                            {{ form.skills.label }}
+                        </label>
+                        {{ form.skills }}
+                        {% if form.skills.errors %}
+                            <div class="invalid-feedback d-block">{{ form.skills.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.resume.id_for_label }}" class="form-label">
+                            {{ form.resume.label }}
+                        </label>
+                        {% if student.resume %}
+                            <p class="alert alert-info mb-3">
+                                <i class="fas fa-file-pdf"></i> Current resume: <a href="{{ student.resume.url }}" target="_blank">View/Download</a>
+                            </p>
+                        {% endif %}
+                        {{ form.resume }}
+                        {% if form.resume.errors %}
+                            <div class="invalid-feedback d-block">{{ form.resume.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Profile
+                    </button>
+                    <a href="{% url 'student_dashboard' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

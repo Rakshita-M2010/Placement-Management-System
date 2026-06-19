@@ -1,0 +1,166 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Student Details - Placement Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="fas fa-user"></i> Student Details</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'admin_students' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Students
+        </a>
+    </div>
+</div>
+
+<!-- Student Information -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-id-card"></i> Personal Information</h5>
+            </div>
+            <div class="card-body">
+                <p>
+                    <strong>Name:</strong><br>
+                    {{ student.user.get_full_name }}
+                </p>
+                <p>
+                    <strong>Email:</strong><br>
+                    {{ student.user.email }}
+                </p>
+                <p>
+                    <strong>Roll Number:</strong><br>
+                    {{ student.roll_number }}
+                </p>
+                <p>
+                    <strong>Branch:</strong><br>
+                    {{ student.get_branch_display }}
+                </p>
+                <p>
+                    <strong>CGPA:</strong><br>
+                    <span class="badge" style="background-color: {% if student.cgpa >= 8 %}#28a745{% elif student.cgpa >= 7 %}#ffc107{% else %}#dc3545{% endif %}; padding: 8px 12px; font-size: 14px;">
+                        {{ student.cgpa }}
+                    </span>
+                </p>
+                <p>
+                    <strong>Phone:</strong><br>
+                    {{ student.phone }}
+                </p>
+                <p>
+                    <strong>Graduation Year:</strong><br>
+                    {{ student.graduation_year }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-briefcase"></i> Professional Information</h5>
+            </div>
+            <div class="card-body">
+                <p>
+                    <strong>Skills:</strong><br>
+                    {% if skills_list %}
+                        {% for skill in skills_list %}
+                            <span class="badge" style="background-color: #0066cc; margin: 4px 4px 4px 0;">
+                                {{ skill }}
+                            </span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="text-muted">No skills provided</span>
+                    {% endif %}
+                </p>
+                <p>
+                    <strong>Resume:</strong><br>
+                    {% if student.resume %}
+                        <a href="{{ student.resume.url }}" target="_blank" class="btn btn-sm btn-primary">
+                            <i class="fas fa-download"></i> Download Resume
+                        </a>
+                    {% else %}
+                        <span class="text-muted">No resume uploaded</span>
+                    {% endif %}
+                </p>
+                <p>
+                    <strong>Profile Created:</strong><br>
+                    {{ student.created_at|date:"d M Y, H:i" }}
+                </p>
+                <p>
+                    <strong>Last Updated:</strong><br>
+                    {{ student.updated_at|date:"d M Y, H:i" }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Applications Section -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-file-alt"></i> Applications ({{ applications|length }})</h5>
+    </div>
+    <div class="card-body">
+        {% if applications %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Job Title</th>
+                            <th>Company</th>
+                            <th>Status</th>
+                            <th>Applied Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for application in applications %}
+                            <tr>
+                                <td>
+                                    <strong>{{ application.job.job_title }}</strong>
+                                </td>
+                                <td>{{ application.job.company.company_name }}</td>
+                                <td>
+                                    <span class="badge" style="background-color: 
+                                        {% if application.status == 'Selected' %}#28a745
+                                        {% elif application.status == 'Interview Scheduled' %}#17a2b8
+                                        {% elif application.status == 'Shortlisted' %}#ffc107
+                                        {% elif application.status == 'Rejected' %}#dc3545
+                                        {% else %}#6c757d{% endif %};">
+                                        {{ application.status }}
+                                    </span>
+                                </td>
+                                <td>{{ application.applied_date|date:"d M Y" }}</td>
+                                <td>
+                                    <a href="{% url 'admin_application_update' application.id %}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i> Update Status
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info mb-0">
+                <i class="fas fa-info-circle"></i> This student has not applied for any jobs yet.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="mt-4 text-center">
+    <a href="{% url 'admin_student_edit' student.id %}" class="btn btn-warning btn-lg">
+        <i class="fas fa-edit"></i> Edit Student
+    </a>
+    <form method="POST" action="{% url 'admin_student_delete' student.id %}" style="display:inline;" data-delete-form data-delete-item="'{{ student.user.get_full_name }}'">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger btn-lg">
+            <i class="fas fa-trash"></i> Delete Student
+        </button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,348 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+
+{% block title %}Placement Reports - Placement Management System{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="dashboard-header mb-4">
+    <h1><i class="fas fa-file-chart-bar"></i> Placement Reports & Analytics</h1>
+    <div class="dashboard-meta">
+        <div class="meta-item">
+            <i class="fas fa-chart-bar"></i>
+            <span>Comprehensive Placement Analysis Dashboard</span>
+        </div>
+    </div>
+</div>
+
+<!-- Report Categories Navigation -->
+<div class="quick-actions mb-4">
+    <a href="{% url 'student_report' %}" class="action-btn">
+        <i class="fas fa-graduation-cap"></i>
+        <span>Student Reports</span>
+    </a>
+    <a href="{% url 'company_report' %}" class="action-btn">
+        <i class="fas fa-building"></i>
+        <span>Company Reports</span>
+    </a>
+    <a href="{% url 'placement_report' %}" class="action-btn">
+        <i class="fas fa-chart-line"></i>
+        <span>Placement Reports</span>
+    </a>
+    <a href="{% url 'application_report' %}" class="action-btn">
+        <i class="fas fa-file-alt"></i>
+        <span>Application Reports</span>
+    </a>
+    <a href="{% url 'interview_report' %}" class="action-btn">
+        <i class="fas fa-calendar-check"></i>
+        <span>Interview Reports</span>
+    </a>
+    <a href="{% url 'admin_dashboard' %}" class="action-btn">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back to Dashboard</span>
+    </a>
+</div>
+
+<!-- Overview Statistics -->
+<h5 class="section-title"><i class="fas fa-chart-pie"></i> Key Metrics</h5>
+<div class="kpi-row">
+    <div class="kpi-card primary">
+        <i class="fas fa-users kpi-icon"></i>
+        <div class="kpi-label">Total Students</div>
+        <div class="kpi-value">{{ total_students }}</div>
+        <div class="kpi-subtext">System registered</div>
+    </div>
+    <div class="kpi-card secondary">
+        <i class="fas fa-check-circle kpi-icon"></i>
+        <div class="kpi-label">Placed</div>
+        <div class="kpi-value">{{ placed_students }}</div>
+        <div class="kpi-subtext">{{ placed_percentage }}% Rate</div>
+    </div>
+    <div class="kpi-card success">
+        <i class="fas fa-arrow-up kpi-icon"></i>
+        <div class="kpi-label">Max Package</div>
+        <div class="kpi-value">₹{{ max_package }}</div>
+        <div class="kpi-subtext">Highest LPA</div>
+    </div>
+    <div class="kpi-card warning">
+        <i class="fas fa-chart-line kpi-icon"></i>
+        <div class="kpi-label">Avg Package</div>
+        <div class="kpi-value">₹{{ avg_package }}</div>
+        <div class="kpi-subtext">Average LPA</div>
+    </div>
+</div>
+
+<!-- Analytics Charts -->
+<h5 class="section-title mt-5"><i class="fas fa-chart-area"></i> Placement Analytics</h5>
+<div class="row mb-4">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-bar"></i> Branch-wise Placements
+            </div>
+            <div class="card-body">
+                <canvas id="branchChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-pie"></i> Company-wise Hiring
+            </div>
+            <div class="card-body">
+                <canvas id="companyChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-list-check"></i> Application Status Distribution
+            </div>
+            <div class="card-body">
+                <canvas id="statusChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-line"></i> Monthly Application Trends
+            </div>
+            <div class="card-body">
+                <canvas id="trendChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Summary -->
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-list"></i> Application Status Breakdown
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Count</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for status, count in status_dist.items %}
+                        <tr>
+                            <td>
+                                <span class="badge badge-{{ status|lower|cut:' ' }}" style="
+                                    {% if status == 'Selected' %}background-color: #2E7D32;
+                                    {% elif status == 'Interview Scheduled' %}background-color: #1976D2;
+                                    {% elif status == 'Shortlisted' %}background-color: #F9A825;
+                                    {% elif status == 'Rejected' %}background-color: #D32F2F;
+                                    {% else %}background-color: #666;{% endif %} color: white;
+                                ">{{ status }}</span>
+                            </td>
+                            <td><strong>{{ count }}</strong></td>
+                            <td>
+                                {% if total_applications > 0 %}
+                                    {{ count|add:0 }}% 
+                                {% else %}
+                                    0%
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-info-circle"></i> Quick Stats
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Total Companies</small>
+                    <div style="font-size: 1.8rem; font-weight: bold; color: #0D47A1;">{{ total_companies }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Active Job Postings</small>
+                    <div style="font-size: 1.8rem; font-weight: bold; color: #1976D2;">{{ total_jobs }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Total Applications</small>
+                    <div style="font-size: 1.8rem; font-weight: bold; color: #2E7D32;">{{ total_applications }}</div>
+                </div>
+                <hr>
+                <p class="mb-2">
+                    <i class="fas fa-percentage" style="color: #F9A825;"></i>
+                    <strong>Placement Rate:</strong> <span style="color: #2E7D32; font-weight: bold;">{{ placed_percentage }}%</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Parse chart data
+    const chartData = {{ chart_data|safe }};
+
+    // Branch-wise Placements Chart
+    const branchCtx = document.getElementById('branchChart');
+    if (branchCtx) {
+        new Chart(branchCtx, {
+            type: 'bar',
+            data: {
+                labels: chartData.branch_names,
+                datasets: [
+                    {
+                        label: 'Total Students',
+                        data: chartData.branch_total,
+                        backgroundColor: '#1976D2',
+                        borderColor: '#0D47A1',
+                        borderWidth: 1,
+                    },
+                    {
+                        label: 'Placed',
+                        data: chartData.branch_placed,
+                        backgroundColor: '#2E7D32',
+                        borderColor: '#1B5E20',
+                        borderWidth: 1,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    }
+                }
+            }
+        });
+    }
+
+    // Company-wise Hiring Chart
+    const companyCtx = document.getElementById('companyChart');
+    if (companyCtx) {
+        new Chart(companyCtx, {
+            type: 'doughnut',
+            data: {
+                labels: chartData.company_names,
+                datasets: [
+                    {
+                        data: chartData.company_applicants,
+                        backgroundColor: [
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                            '#FF9F40', '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'
+                        ],
+                        borderColor: '#fff',
+                        borderWidth: 2,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+    }
+
+    // Application Status Distribution Chart
+    const statusCtx = document.getElementById('statusChart');
+    if (statusCtx) {
+        new Chart(statusCtx, {
+            type: 'pie',
+            data: {
+                labels: chartData.status_labels,
+                datasets: [
+                    {
+                        data: chartData.status_values,
+                        backgroundColor: ['#6C757D', '#F9A825', '#1976D2', '#2E7D32', '#D32F2F'],
+                        borderColor: '#fff',
+                        borderWidth: 2,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
+        });
+    }
+
+    // Monthly Trends Chart
+    const trendCtx = document.getElementById('trendChart');
+    if (trendCtx) {
+        const monthlyData = chartData.monthly_data;
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: monthlyData.map(m => new Date(m.month).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })),
+                datasets: [
+                    {
+                        label: 'Applications',
+                        data: monthlyData.map(m => m.count),
+                        borderColor: '#1976D2',
+                        backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                    },
+                    {
+                        label: 'Selected',
+                        data: monthlyData.map(m => m.selected),
+                        borderColor: '#2E7D32',
+                        backgroundColor: 'rgba(46, 125, 50, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    }
+                }
+            }
+        });
+    }
+</script>
+
+{% endblock %}

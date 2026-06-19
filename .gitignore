@@ -1,0 +1,31 @@
+# Virtual Environment
+.venv/
+venv/
+Include/
+Lib/
+Scripts/
+pyvenv.cfg
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE
+.vscode/
+.idea/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment Variables
+.env
+
+# Django Media Uploads (optional)
+media/uploads/
+
+*.mp4

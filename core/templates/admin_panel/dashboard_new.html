@@ -1,0 +1,454 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+
+{% block title %}Placement Officer Dashboard - Placement Management System{% endblock %}
+
+{% block content %}
+
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <h1>Placement Officer Dashboard</h1>
+    <div class="dashboard-meta">
+        <div class="meta-item">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Current Year: <strong>2025-2026</strong></span>
+        </div>
+        <div class="meta-item">
+            <i class="fas fa-sync-alt"></i>
+            <span>Last Updated: <strong><span id="lastUpdate">just now</span></strong></span>
+        </div>
+    </div>
+</div>
+
+<!-- KPI Cards - Row 1: Core Student Metrics -->
+<h5 class="section-title"><i class="fas fa-graduation-cap"></i> Student Statistics</h5>
+<div class="kpi-row">
+    <div class="kpi-card primary">
+        <i class="fas fa-users kpi-icon"></i>
+        <div class="kpi-label">Total Students</div>
+        <div class="kpi-value">{{ total_students }}</div>
+        <div class="kpi-subtext">Registered in system</div>
+    </div>
+    <div class="kpi-card secondary">
+        <i class="fas fa-check-circle kpi-icon"></i>
+        <div class="kpi-label">Eligible Students</div>
+        <div class="kpi-value">{{ eligible_students }}</div>
+        <div class="kpi-subtext">Matching criteria</div>
+    </div>
+    <div class="kpi-card success">
+        <i class="fas fa-thumbs-up kpi-icon"></i>
+        <div class="kpi-label">Placed Students</div>
+        <div class="kpi-value">{{ placed_students }}</div>
+        <div class="kpi-subtext">Successfully placed</div>
+    </div>
+    <div class="kpi-card warning">
+        <i class="fas fa-chart-pie kpi-icon"></i>
+        <div class="kpi-label">Placement %</div>
+        <div class="kpi-value">{{ placement_percentage }}%</div>
+        <div class="kpi-subtext">Overall rate</div>
+    </div>
+</div>
+
+<!-- KPI Cards - Row 2: Drive & Interview Metrics -->
+<h5 class="section-title"><i class="fas fa-briefcase"></i> Recruitment Activity</h5>
+<div class="kpi-row">
+    <div class="kpi-card primary">
+        <i class="fas fa-building kpi-icon"></i>
+        <div class="kpi-label">Registered Companies</div>
+        <div class="kpi-value">{{ total_companies }}</div>
+        <div class="kpi-subtext">On boarding</div>
+    </div>
+    <div class="kpi-card secondary">
+        <i class="fas fa-rocket kpi-icon"></i>
+        <div class="kpi-label">Active Drives</div>
+        <div class="kpi-value">{{ active_drives }}</div>
+        <div class="kpi-subtext">Ongoing recruitment</div>
+    </div>
+    <div class="kpi-card warning">
+        <i class="fas fa-calendar-check kpi-icon"></i>
+        <div class="kpi-label">Interviews Scheduled</div>
+        <div class="kpi-value">{{ interviews_scheduled }}</div>
+        <div class="kpi-subtext">Total scheduled</div>
+    </div>
+    <div class="kpi-card success">
+        <i class="fas fa-hourglass-end kpi-icon"></i>
+        <div class="kpi-label">Pending Applications</div>
+        <div class="kpi-value">{{ pending_applications }}</div>
+        <div class="kpi-subtext">Awaiting shortlist</div>
+    </div>
+</div>
+
+<!-- KPI Cards - Row 3: Package & Selection Metrics -->
+<h5 class="section-title"><i class="fas fa-money-bill-wave"></i> Placement Metrics</h5>
+<div class="kpi-row">
+    <div class="kpi-card success">
+        <i class="fas fa-crown kpi-icon"></i>
+        <div class="kpi-label">Highest Package</div>
+        <div class="kpi-value">₹{{ highest_package }} LPA</div>
+        <div class="kpi-subtext">Maximum offered</div>
+    </div>
+    <div class="kpi-card secondary">
+        <i class="fas fa-chart-line kpi-icon"></i>
+        <div class="kpi-label">Average Package</div>
+        <div class="kpi-value">₹{{ average_package }} LPA</div>
+        <div class="kpi-subtext">Mean salary</div>
+    </div>
+    <div class="kpi-card primary">
+        <i class="fas fa-file-contract kpi-icon"></i>
+        <div class="kpi-label">Total Offers</div>
+        <div class="kpi-value">{{ total_offers }}</div>
+        <div class="kpi-subtext">Job offers made</div>
+    </div>
+    <div class="kpi-card warning">
+        <i class="fas fa-star kpi-icon"></i>
+        <div class="kpi-label">Selections</div>
+        <div class="kpi-value">{{ total_selections }}</div>
+        <div class="kpi-subtext">Students selected</div>
+    </div>
+</div>
+
+<!-- Quick Actions Panel -->
+<h5 class="section-title"><i class="fas fa-bolt"></i> Quick Actions</h5>
+<div class="quick-actions">
+    <a href="{% url 'admin_company_create' %}" class="action-btn">
+        <i class="fas fa-building"></i>
+        Add Company
+    </a>
+    <a href="{% url 'admin_job_create' %}" class="action-btn">
+        <i class="fas fa-briefcase"></i>
+        Create Job Drive
+    </a>
+    <a href="{% url 'admin_interviews' %}" class="action-btn">
+        <i class="fas fa-calendar-alt"></i>
+        Schedule Interview
+    </a>
+    <a href="{% url 'admin_applications' %}" class="action-btn">
+        <i class="fas fa-check-double"></i>
+        Publish Results
+    </a>
+    <a href="{% url 'admin_reports' %}" class="action-btn">
+        <i class="fas fa-file-pdf"></i>
+        View Reports
+    </a>
+    <a href="{% url 'admin_reports' %}" class="action-btn">
+        <i class="fas fa-download"></i>
+        Export Data
+    </a>
+</div>
+
+<!-- Two Column Layout for Activity and Upcoming Interviews -->
+<div class="row">
+    <!-- Recent Activity Section -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-history"></i> Recent Activity
+            </div>
+            <div class="card-body">
+                {% if recent_activities %}
+                    {% for activity in recent_activities %}
+                    <div class="activity-item">
+                        <div class="activity-icon {{ activity.color }}">
+                            <i class="fas {{ activity.icon }}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">{{ activity.text }}</div>
+                            <div class="activity-time">{{ activity.timestamp|timesince }} ago</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center py-3">No recent activities</p>
+                {% endif %}
+            </div>
+            <div class="card-footer text-center">
+                <a href="{% url 'admin_applications' %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-list"></i> View All
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Interviews Section -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-calendar-check"></i> Upcoming Interviews (Next 7 Days)
+            </div>
+            <div class="card-body">
+                {% if upcoming_interviews %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Company</th>
+                                    <th>Date & Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for interview in upcoming_interviews %}
+                                <tr>
+                                    <td>
+                                        <small>{{ interview.application.student.user.get_full_name }}</small>
+                                    </td>
+                                    <td>
+                                        <small>{{ interview.application.job.company.company_name }}</small>
+                                    </td>
+                                    <td>
+                                        <small>
+                                            <i class="fas fa-calendar-day"></i>
+                                            {{ interview.date|date:"d M" }}
+                                            <br>
+                                            <i class="fas fa-clock"></i>
+                                            {{ interview.time|time:"H:i" }}
+                                        </small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center py-3">No upcoming interviews</p>
+                {% endif %}
+            </div>
+            <div class="card-footer text-center">
+                <a href="{% url 'admin_interviews' %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-list"></i> View All Interviews
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Analytics Charts Section -->
+<h5 class="section-title mt-5"><i class="fas fa-chart-area"></i> Placement Analytics</h5>
+
+<div class="row">
+    <!-- Chart 1: Students Placed per Branch -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-bar"></i> Students Placed per Branch
+            </div>
+            <div class="card-body">
+                <canvas id="branchChart" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart 2: Company-wise Hiring -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-pie"></i> Company-wise Hiring Count
+            </div>
+            <div class="card-body">
+                <canvas id="companyChart" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart 3: Monthly Applications -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-line"></i> Monthly Applications
+            </div>
+            <div class="card-body">
+                <canvas id="monthlyChart" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart 4: Application Status Distribution -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-doughnut"></i> Application Status Distribution
+            </div>
+            <div class="card-body">
+                <canvas id="statusChart" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Script -->
+<script>
+    // Chart Color Scheme
+    const chartColors = {
+        primary: '#0D47A1',
+        secondary: '#1976D2',
+        success: '#2E7D32',
+        warning: '#F9A825',
+        info: '#1976D2',
+        background: '#F5F7FA'
+    };
+
+    // Chart 1: Students Placed per Branch
+    const branchCtx = document.getElementById('branchChart').getContext('2d');
+    const branchNames = {{ branch_names | safe }};
+    const branchTotals = {{ branch_totals | safe }};
+    const branchPlaced = {{ branch_placed | safe }};
+
+    new Chart(branchCtx, {
+        type: 'bar',
+        data: {
+            labels: branchNames,
+            datasets: [
+                {
+                    label: 'Total Students',
+                    data: branchTotals,
+                    backgroundColor: chartColors.info,
+                    borderColor: chartColors.primary,
+                    borderWidth: 1
+                },
+                {
+                    label: 'Placed Students',
+                    data: branchPlaced,
+                    backgroundColor: chartColors.success,
+                    borderColor: chartColors.success,
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: Math.max(...branchTotals) + 5
+                }
+            }
+        }
+    });
+
+    // Chart 2: Company-wise Hiring
+    const companyCtx = document.getElementById('companyChart').getContext('2d');
+    const companyNames = {{ company_names | safe }};
+    const companyCounts = {{ company_counts | safe }};
+
+    new Chart(companyCtx, {
+        type: 'doughnut',
+        data: {
+            labels: companyNames.length > 0 ? companyNames : ['No Data'],
+            datasets: [{
+                data: companyCounts.length > 0 ? companyCounts : [1],
+                backgroundColor: [
+                    chartColors.primary,
+                    chartColors.secondary,
+                    chartColors.success,
+                    chartColors.warning,
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#4BC0C0',
+                    '#9966FF',
+                    '#FF9F40'
+                ],
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'right'
+                }
+            }
+        }
+    });
+
+    // Chart 3: Monthly Applications
+    const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+    const months = {{ months | safe }};
+    const appCounts = {{ app_counts | safe }};
+
+    new Chart(monthlyCtx, {
+        type: 'line',
+        data: {
+            labels: months.length > 0 ? months : ['No Data'],
+            datasets: [{
+                label: 'Applications',
+                data: appCounts.length > 0 ? appCounts : [0],
+                borderColor: chartColors.primary,
+                backgroundColor: 'rgba(13, 71, 161, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: chartColors.primary,
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Chart 4: Application Status Distribution
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    const statusLabels = {{ status_labels | safe }};
+    const statusCounts = {{ status_counts | safe }};
+
+    new Chart(statusCtx, {
+        type: 'pie',
+        data: {
+            labels: statusLabels.length > 0 ? statusLabels : ['No Data'],
+            datasets: [{
+                data: statusCounts.length > 0 ? statusCounts : [1],
+                backgroundColor: [
+                    '#2196F3',  // Applied - Blue
+                    '#FF9800',  // Shortlisted - Orange
+                    '#9C27B0',  // Interview Scheduled - Purple
+                    '#2E7D32',  // Selected - Green
+                    '#D32F2F'   // Rejected - Red
+                ],
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Update "Last Updated" time
+    function updateLastUpdate() {
+        const now = new Date();
+        document.getElementById('lastUpdate').textContent = now.toLocaleTimeString();
+    }
+    updateLastUpdate();
+</script>
+
+{% endblock %}

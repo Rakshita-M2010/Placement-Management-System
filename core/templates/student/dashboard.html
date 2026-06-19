@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Placement Manager{% endblock %}
+
+{% block content %}
+<!-- Statistics Section -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="stat-card primary">
+            <div class="label"><i class="fas fa-file-alt"></i> Total Applications</div>
+            <div class="number">{{ stats.total_applications }}</div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stat-card warning">
+            <div class="label"><i class="fas fa-check-circle"></i> Shortlisted</div>
+            <div class="number">{{ stats.shortlisted }}</div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stat-card info">
+            <div class="label"><i class="fas fa-calendar-alt"></i> Interviews</div>
+            <div class="number">{{ stats.interview_scheduled }}</div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stat-card success">
+            <div class="label"><i class="fas fa-trophy"></i> Selected</div>
+            <div class="number">{{ stats.selected }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-user"></i> Your Profile Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
+                        <p><strong>Roll Number:</strong> {{ student.roll_number }}</p>
+                        <p><strong>Branch:</strong> {{ student.get_branch_display }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>CGPA:</strong> <span class="badge bg-primary" style="font-size: 0.9rem;">{{ student.cgpa }}</span></p>
+                        <p><strong>Graduation Year:</strong> {{ student.graduation_year }}</p>
+                        <p><strong>Resume:</strong> 
+                            {% if student.resume %}
+                                <span class="badge bg-success"><i class="fas fa-check"></i> Uploaded</span>
+                            {% else %}
+                                <span class="badge bg-warning"><i class="fas fa-exclamation-triangle"></i> Not Uploaded</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                <a href="{% url 'student_profile' %}" class="btn btn-primary btn-sm mt-3">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Applications Section -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-file-alt"></i> Your Recent Applications</h5>
+            </div>
+            {% if applications %}
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Job Title</th>
+                                    <th>Company</th>
+                                    <th>Applied Date</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for application in applications|slice:":5" %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ application.job.job_title }}</strong>
+                                        </td>
+                                        <td>{{ application.job.company.company_name }}</td>
+                                        <td>{{ application.applied_date|date:"d M, Y" }}</td>
+                                        <td>
+                                            {% if application.status == "Applied" %}
+                                                <span class="badge bg-info">{{ application.status }}</span>
+                                            {% elif application.status == "Shortlisted" %}
+                                                <span class="badge bg-warning">{{ application.status }}</span>
+                                            {% elif application.status == "Interview Scheduled" %}
+                                                <span class="badge bg-primary">{{ application.status }}</span>
+                                            {% elif application.status == "Selected" %}
+                                                <span class="badge bg-success">{{ application.status }}</span>
+                                            {% elif application.status == "Rejected" %}
+                                                <span class="badge bg-danger">{{ application.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'job_detail' application.job.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{% url 'student_applications' %}" class="btn btn-primary">
+                        <i class="fas fa-list"></i> View All Applications
+                    </a>
+                </div>
+            {% else %}
+                <div class="card-body">
+                    <p class="text-center text-muted">
+                        <i class="fas fa-inbox"></i> You haven't applied for any jobs yet.
+                    </p>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{% url 'job_list' %}" class="btn btn-primary">
+                        <i class="fas fa-briefcase"></i> Browse Jobs
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

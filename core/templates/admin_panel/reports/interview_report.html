@@ -1,0 +1,199 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+
+{% block title %}Interview Reports - Placement Management System{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="dashboard-header mb-4">
+    <h1><i class="fas fa-calendar-check"></i> Interview Reports</h1>
+    <div class="dashboard-meta">
+        <div class="meta-item">
+            <span>Manage and track interviews - upcoming and completed</span>
+        </div>
+    </div>
+</div>
+
+<!-- Interview Status Cards -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 style="color: #1976D2;"><i class="fas fa-calendar-alt"></i> {{ upcoming_count }}</h3>
+                <p class="text-muted mb-0">Upcoming Interviews</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 style="color: #2E7D32;"><i class="fas fa-check"></i> {{ completed_count }}</h3>
+                <p class="text-muted mb-0">Completed Interviews</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Toggle -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-bars"></i> Interview View
+    </div>
+    <div class="card-body">
+        <div class="btn-group w-100" role="group">
+            <a href="?show=upcoming{% if request.GET.export %}&export={{ request.GET.export }}{% endif %}" 
+               class="btn btn-{% if show_type == 'upcoming' %}primary{% else %}outline-primary{% endif %}">
+                <i class="fas fa-calendar-alt"></i> Upcoming (Next 7 Days)
+            </a>
+            <a href="?show=completed{% if request.GET.export %}&export={{ request.GET.export }}{% endif %}" 
+               class="btn btn-{% if show_type == 'completed' %}primary{% else %}outline-primary{% endif %}">
+                <i class="fas fa-check"></i> Completed
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Section -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-filter"></i> Filter Interviews
+    </div>
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <input type="hidden" name="show" value="{{ show_type }}">
+            <div class="col-md-3">
+                <select class="form-control" name="type">
+                    <option value="all">All Types</option>
+                    {% for itype in interview_types %}
+                        <option value="{{ itype }}" {% if interview_type_filter == itype %}selected{% endif %}>{{ itype }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-control" name="company">
+                    <option value="">All Companies</option>
+                    {% for company in companies %}
+                        <option value="{{ company.id }}" {% if company_filter == company.id|stringformat:"s" %}selected{% endif %}>{{ company.company_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="date" class="form-control" name="date_from" value="{{ date_from }}" placeholder="From Date">
+            </div>
+            <div class="col-md-2">
+                <input type="date" class="form-control" name="date_to" value="{{ date_to }}" placeholder="To Date">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Export Buttons -->
+<div class="mb-3">
+    <a href="?{{ request.GET.urlencode }}&export=csv" class="btn btn-success btn-sm"><i class="fas fa-download"></i> Export CSV</a>
+    <a href="?{{ request.GET.urlencode }}&export=excel" class="btn btn-info btn-sm"><i class="fas fa-download"></i> Export Excel</a>
+    <a href="{% url 'admin_reports' %}" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
+</div>
+
+<!-- Interviews Table -->
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-table"></i> 
+        {% if show_type == 'upcoming' %}
+            Upcoming Interviews ({{ page_obj.paginator.count }} total)
+        {% else %}
+            Completed Interviews ({{ page_obj.paginator.count }} total)
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if page_obj %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Roll No.</th>
+                            <th>Company</th>
+                            <th>Interview Type</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Venue</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for interview in page_obj %}
+                            {% now "Y-m-d" as today %}
+                            <tr>
+                                <td><strong>{{ interview.application.student.user.get_full_name }}</strong></td>
+                                <td>{{ interview.application.student.roll_number }}</td>
+                                <td>{{ interview.application.job.company.company_name }}</td>
+                                <td>
+                                    <span class="badge bg-info">{{ interview.interview_type }}</span>
+                                </td>
+                                <td>{{ interview.date|date:"Y-m-d" }}</td>
+                                <td><strong>{{ interview.time|time:"H:i" }}</strong></td>
+                                <td>{{ interview.venue }}</td>
+                                <td>
+                                    {% if interview.date < today %}
+                                        <span class="badge bg-success"><i class="fas fa-check"></i> Completed</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark"><i class="fas fa-hourglass"></i> Upcoming</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox"></i> No interviews found matching your filters
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1&{{ request.GET.urlencode }}">First</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">Previous</a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num }}&{{ request.GET.urlencode }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">Next</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&{{ request.GET.urlencode }}">Last</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle"></i> No interviews found matching your criteria.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

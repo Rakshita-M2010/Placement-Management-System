@@ -1,0 +1,168 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+
+{% block title %}Placement Reports - Placement Management System{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="dashboard-header mb-4">
+    <h1><i class="fas fa-chart-line"></i> Placement Analysis Reports</h1>
+    <div class="dashboard-meta">
+        <div class="meta-item">
+            <span>Comprehensive placement statistics by branch, company, or student</span>
+        </div>
+    </div>
+</div>
+
+<!-- Report Type Selection -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-bars"></i> Report Type
+    </div>
+    <div class="card-body">
+        <div class="btn-group w-100" role="group">
+            <a href="?type=student{% if request.GET.export %}&export={{ request.GET.export }}{% endif %}" 
+               class="btn btn-{% if report_type == 'student' %}primary{% else %}outline-primary{% endif %}">
+                <i class="fas fa-user"></i> Student-wise
+            </a>
+            <a href="?type=branch{% if request.GET.export %}&export={{ request.GET.export }}{% endif %}" 
+               class="btn btn-{% if report_type == 'branch' %}primary{% else %}outline-primary{% endif %}">
+                <i class="fas fa-sitemap"></i> Branch-wise
+            </a>
+            <a href="?type=company{% if request.GET.export %}&export={{ request.GET.export }}{% endif %}" 
+               class="btn btn-{% if report_type == 'company' %}primary{% else %}outline-primary{% endif %}">
+                <i class="fas fa-building"></i> Company-wise
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Export Buttons -->
+<div class="mb-3">
+    <a href="?type={{ report_type }}&export=csv" class="btn btn-success btn-sm"><i class="fas fa-download"></i> Export CSV</a>
+    <a href="?type={{ report_type }}&export=excel" class="btn btn-info btn-sm"><i class="fas fa-download"></i> Export Excel</a>
+    <a href="{% url 'admin_reports' %}" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
+</div>
+
+<!-- Report Content -->
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-table"></i> 
+        {% if report_type == 'branch' %}
+            Branch-wise Placement Details
+        {% elif report_type == 'company' %}
+            Company-wise Placement Analysis
+        {% else %}
+            Student-wise Placement Details
+        {% endif %}
+        ({{ page_obj.paginator.count }} records)
+    </div>
+    <div class="card-body">
+        {% if page_obj %}
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            {% if report_type == 'branch' %}
+                                <th>Branch</th>
+                                <th>Total Students</th>
+                                <th>Placed</th>
+                                <th>Placement Rate</th>
+                                <th>Avg CGPA</th>
+                                <th>Avg Package (LPA)</th>
+                                <th>Max Package (LPA)</th>
+                                <th>Min Package (LPA)</th>
+                            {% elif report_type == 'company' %}
+                                <th>Company</th>
+                                <th>Package (LPA)</th>
+                                <th>Total Selected</th>
+                                <th>Unique Students</th>
+                            {% else %}
+                                <th>Name</th>
+                                <th>Roll No.</th>
+                                <th>Branch</th>
+                                <th>Company</th>
+                                <th>Package (LPA)</th>
+                                <th>Applied Date</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in page_obj %}
+                            <tr>
+                                {% if report_type == 'branch' %}
+                                    <td><strong>{{ item.branch }}</strong></td>
+                                    <td>{{ item.total_students }}</td>
+                                    <td>{{ item.placed }}</td>
+                                    <td><strong>{{ item.placement_rate }}%</strong></td>
+                                    <td>{{ item.avg_cgpa }}</td>
+                                    <td>₹{{ item.avg_package }}</td>
+                                    <td>₹{{ item.max_package }}</td>
+                                    <td>₹{{ item.min_package }}</td>
+                                {% elif report_type == 'company' %}
+                                    <td><strong>{{ item.company_name }}</strong></td>
+                                    <td>₹{{ item.package }}</td>
+                                    <td>{{ item.total_selected }}</td>
+                                    <td>{{ item.unique_students }}</td>
+                                {% else %}
+                                    <td><strong>{{ item.student.user.get_full_name }}</strong></td>
+                                    <td>{{ item.student.roll_number }}</td>
+                                    <td>{{ item.student.branch }}</td>
+                                    <td>{{ item.company.company_name }}</td>
+                                    <td><strong>₹{{ item.company.package }}</strong></td>
+                                    <td>{{ item.applied_date|date:"Y-m-d H:i" }}</td>
+                                {% endif %}
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox"></i> No data available for this report type
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1&type={{ report_type }}">First</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&type={{ report_type }}">Previous</a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num }}&type={{ report_type }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}&type={{ report_type }}">Next</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&type={{ report_type }}">Last</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle"></i> No placement data available for this report.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
