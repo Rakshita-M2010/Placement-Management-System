@@ -12,6 +12,56 @@ This is a full-stack Django application designed to automate placement process m
 
 ---
 
+## ScreenShots
+### Home Page
+
+<img width="960" height="564" alt="Screenshot 2026-06-19 184200" src="https://github.com/user-attachments/assets/ad42c28d-606b-4b42-b0a4-3e48e8b84d02" />
+
+### Admin Dashboard
+
+<img width="960" height="564" alt="Screenshot 2026-06-19 185526" src="https://github.com/user-attachments/assets/eb92beaa-a6ca-4a04-894f-1f3460ed43f9" />
+
+### Student Dashboard
+
+<img width="960" height="600" alt="Screenshot 2026-06-19 184048" src="https://github.com/user-attachments/assets/3659009e-e709-4842-af25-c83673430073" />
+
+###  Student Management
+
+<img width="960" height="564" alt="Screenshot 2026-06-19 185536" src="https://github.com/user-attachments/assets/b282772c-9af8-4162-beb0-c5cbf80695bc" />
+
+###  Company Management
+
+<img width="960" height="564" alt="Screenshot 2026-06-19 185543" src="https://github.com/user-attachments/assets/7114a06f-490d-4dba-a828-6d3d841fb202" />
+
+###  Job Management
+
+<img width="960" height="564" alt="Screenshot 2026-06-19 185551" src="https://github.com/user-attachments/assets/6f4add60-f32d-4167-9edc-4574bce1610e" />
+
+###  Application Management
+
+<img width="960" height="564" alt="Screenshot 2026-06-19 185558" src="https://github.com/user-attachments/assets/0a432ae4-49fa-4fb8-add8-0af81b51cb40" />
+
+###  Interview Management
+
+<img width="960" height="564" alt="Screenshot 2026-06-19 185608" src="https://github.com/user-attachments/assets/e851df2a-d4f2-4bb7-94cf-9f963e9f34dc" />
+
+### Reports
+
+<img width="960" height="564" alt="Screenshot 2026-06-19 185614" src="https://github.com/user-attachments/assets/c35cbb82-5544-4a43-8768-dbe9972676dc" />
+
+
+## Key Features
+
+- Role-Based Authentication (Admin & Student)
+- Job Application Management
+- Interview Scheduling System
+- Placement Result Tracking
+- Notification System
+- Placement Analytics & Reports
+- Resume Upload Support
+- Responsive Bootstrap UI
+
+  
 ## 🛠 Technology Stack
 
 | Component | Technology |
@@ -522,7 +572,31 @@ For improvements:
 4. Maintain existing code style
 
 ---
+## Future Enhancements
 
+- Email Notifications
+- Company Portal
+- REST API Integration
+- React Frontend
+- Resume Parsing
+- Placement Prediction Analytics
+- Excel/PDF Report Export
+
+
+  ## Skills Demonstrated
+
+- Python
+- Django
+- MySQL
+- SQLite
+- HTML/CSS
+- Bootstrap
+- Authentication & Authorization
+- Database Design
+- Git & GitHub
+- Full Stack Development
+
+  
 ## 📞 Support & Documentation
 
 - Django Documentation: https://docs.djangoproject.com/
